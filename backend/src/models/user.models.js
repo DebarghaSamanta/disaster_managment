@@ -27,6 +27,11 @@ const userSchema = new Schema({
         type: String,
         required: [true,"password is required"] // should be hashed before saving
     },
+    department: {
+        type: String,
+        enum: ["Logistics and Operation Planning","Driver"],
+        required: true
+    },
     govtIdProof: {
         type: String, // URL to the uploaded ID proof
         required: true
@@ -35,11 +40,7 @@ const userSchema = new Schema({
         type: String, // URL to the uploaded photo cloudinary
         required: true
     },
-    department: {
-        type: String,
-        enum: ["Logistics and Operation Planning","Driver"],
-        required: true
-    },
+    
     refreshToken:{
         type:String
     },

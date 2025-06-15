@@ -1,0 +1,77 @@
+.register-container {
+  max-width: 700px;
+  margin: 80px auto;
+  padding: 2rem;
+  border-radius: 10px;
+  background-color: #f8f8f8;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.register-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #333;
+}
+
+.register-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+input[type="file"] {
+  padding: 0.4rem;
+  border: none;
+  background-color: #fff;
+  font-size: 0.9rem;
+}
+
+.file-input::file-selector-button {
+  background-color: #007bff;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.file-input::file-selector-button:hover {
+  background-color: #0056b3;
+}
+
+.register-button {
+  grid-column: span 2;
+  padding: 0.8rem;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.register-button:hover {
+  background-color: #0056b3;
+}
