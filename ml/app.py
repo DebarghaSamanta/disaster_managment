@@ -61,7 +61,10 @@ def predict(data: InputData):
         'Sanitary Pads Supply (pcs)',
         'Medicine Supply (kg)'
     ]
-    prediction = dict(zip(y_labels, prediction_values))
+    prediction = {
+    label: round(value)
+    for label, value in zip(y_labels, prediction_values)
+    }
     print("Saving to MongoDB...")
     #Save both input and output to MongoDB
     collection.insert_one({

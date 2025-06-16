@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './calculator.css'; // 👈 Import the CSS file
 
 const Calculator = () => {
   const initialFormData = {
@@ -28,7 +29,6 @@ const Calculator = () => {
     setErrorMessage('');
     setPrediction(null);
 
-    // Format and type-cast inputs for FastAPI
     const formattedData = {
       Disaster_Type: formData.Disaster_Type.trim(),
       Severity: parseInt(formData.Severity),
@@ -54,62 +54,54 @@ const Calculator = () => {
     } catch (err) {
       if (err.response) {
         setErrorMessage(`Server Error: ${JSON.stringify(err.response.data)}`);
-        console.error('Server Error:', err.response.data);
       } else if (err.request) {
         setErrorMessage('No response from server. Make sure FastAPI is running.');
-        console.error('No Response:', err.request);
       } else {
         setErrorMessage(`Request Error: ${err.message}`);
-        console.error('Error:', err.message);
       }
     }
   };
 
-  // Utility for better labels
   const formatLabel = (key) =>
     key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
   return (
-    <div className='main_div'>
-      <h1>Disaster Relief Supply Predictor</h1>
-      <form onSubmit={handleSubmit}>
-        {Object.entries(formData).map(([key, value]) => {
-          const isNumber = key !== 'Disaster_Type';
-          return (
-            <div key={key} >
-              <label>
+    <div className={`calculator-container ${prediction ? 'with-results' : ''}`}>
+      <h1 className="main-heading">Disaster Relief Supply Calculator</h1>
+      <div className="left-panel">
+        <h1 className="calculator-title">Input Parameters</h1>
+        <form onSubmit={handleSubmit} className="calculator-form">
+          {Object.entries(formData).map(([key, value]) => (
+            <div key={key} className="form-group">
+              <label className="form-label">
                 {formatLabel(key)}:
                 <input
-                  type={isNumber ? 'number' : 'text'}
+                  type={key !== 'Disaster_Type' ? 'number' : 'text'}
                   name={key}
                   value={value}
                   onChange={handleChange}
                   required
-                  
+                  className="form-input"
                 />
               </label>
             </div>
-          );
-        })}
-        <button type="submit" >Predict</button>
-      </form>
-
-      {errorMessage && (
-        <div >
-          <strong>Error:</strong> {errorMessage}
-        </div>
-      )}
+          ))}
+          <button type="submit" className="submit-button">Predict</button>
+        </form>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
+      </div>
 
       {prediction && (
-        <div >
-          <h2>Predicted Relief Supplies:</h2>
-          <ul>
+        <div className="right-panel">
+          <h2 className="prediction-title">Predicted Relief Supplies</h2>
+          <div className="card-grid">
             {Object.entries(prediction).map(([item, amount]) => (
-              <li key={item}>
-                {item}: {amount.toFixed(2)}
-              </li>
+              <div key={item} className="prediction-card">
+                <h3>{item}</h3>
+                <p>{amount.toFixed(2)}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>
