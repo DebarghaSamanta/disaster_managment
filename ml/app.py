@@ -5,10 +5,15 @@ import joblib
 import datetime
 import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
+import os
+# importing necessary functions from dotenv library
+from dotenv import load_dotenv, dotenv_values 
+# loading variables from .env file
+load_dotenv() 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # or ["*"] to allow all
+    allow_origins=[os.getenv("CORS_ORIGIN")],  # or ["*"] to allow all
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -16,7 +21,7 @@ app.add_middleware(
 #LOading the file from where it is kept
 model = joblib.load("disaster_releif_calculator.pkl")
 
-client = MongoClient("mongodb+srv://debarghasamanta2004:DipenSamanta2000@disasterreleif.amshhkz.mongodb.net")
+client = MongoClient(os.getenv("MONGODB_URL"))
 db = client["disaster_db"]
 collection = db["predictions"]
 #pydantic for checking importaing basemodel from that package
