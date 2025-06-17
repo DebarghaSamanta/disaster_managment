@@ -18,7 +18,7 @@ const Calculator = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [prediction, setPrediction] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
-
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -28,6 +28,10 @@ const Calculator = () => {
     e.preventDefault();
     setErrorMessage('');
     setPrediction(null);
+    if (response.status === 200 && response.data?.prediction) {
+        setPrediction(response.data.prediction);
+        setIsSubmitted(true); // ✅ Disable further submissions
+    }
 
     const formattedData = {
       Disaster_Type: formData.Disaster_Type.trim(),
@@ -86,7 +90,7 @@ const Calculator = () => {
               </label>
             </div>
           ))}
-          <button type="submit" className="submit-button">Predict</button>
+          <button type="submit" className="submit-button" disabled={isSubmitted}>{isSubmitted ? 'Prediction Done' : 'Predict'}</button>
         </form>
         {errorMessage && <div className="error-message">{errorMessage}</div>}
       </div>
