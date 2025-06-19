@@ -9,13 +9,13 @@ export const createAssignment = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
-  // 🔍 Fetch AidRecord to get predicted_aid
+  //  Fetch AidRecord to get predicted_aid
   const aidRecord = await AidRecord.findById(predictionId);
   if (!aidRecord) {
     return res.status(404).json({ message: "Prediction not found" });
   }
 
-  // 📦 Prepare the assignment
+  //  Prepare the assignment
   const assignment = {
     source,
     destination,
@@ -24,7 +24,7 @@ export const createAssignment = asyncHandler(async (req, res) => {
     predictedAid: aidRecord.predicted_aid // ✅ Attach predicted aid
   };
 
-  // 🔁 Update or create DriverAssignment document
+  //  Update or create DriverAssignment document
   let driver = await DriverAssignment.findOne({ driverId });
 
   if (driver) {
