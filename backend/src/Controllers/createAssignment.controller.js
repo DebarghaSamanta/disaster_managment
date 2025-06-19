@@ -1,41 +1,51 @@
 import { DriverAssignment } from "../models/assignment.model.js";
-import { AidRecord } from "../models/calculator.models.js";
-import { asyncHandler } from "../utils/asynchandler.js";
+import { User } from "../models/user.models.js";
+export const assignAidToDriver = async (req, res) => {
+  try {
+    const { driverId, source, destination, predictedAidId } = req.body;
 
-export const createAssignment = asyncHandler(async (req, res) => {
-  const { driverId, source, destination, predictionId } = req.body;
+    if (!driverId || !source || !destination || !predictedAidId) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
 
-  if (!driverId || !source || !destination || !predictionId) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
+    // Create the new assignment
+    const newAssignment = {
+      source,
+      destination,
+      predictedAid: predictedAidId,
+      status: "pending"
+    };
 
-  //  Fetch AidRecord to get predicted_aid
-  const aidRecord = await AidRecord.findById(predictionId);
-  if (!aidRecord) {
-    return res.status(404).json({ message: "Prediction not found" });
-  }
+    // Check if DriverAssignment already exists
+    let driverAssignment = await DriverAssignment.findOne({ driverId });
 
-  //  Prepare the assignment
-  const assignment = {
-    source,
-    destination,
-    status: "pending",
-    assignedAt: new Date(),
-    predictedAid: aidRecord.predicted_aid // ✅ Attach predicted aid
-  };
+    if (!driverAssignment) {
+      // If not, create a new document
+      driverAssignment = new DriverAssignment({
+        driverId,
+        assignments: [newAssignment]
+      });
+    } else {
+      // Else push new assignment to existing one
+      driverAssignment.assignments.push(newAssignment);
+    }
 
-  //  Update or create DriverAssignment document
-  let driver = await DriverAssignment.findOne({ driverId });
+    // Save to DB
+    await driverAssignment.save();
 
-  if (driver) {
-    driver.assignments.push(assignment);
-    await driver.save();
-  } else {
-    driver = await DriverAssignment.create({
-      driverId,
-      assignments: [assignment]
+    const updatedDriver = await User.findByIdAndUpdate(driverId, { availabilityStatus: false },{new:true});
+    if (!updatedDriver) {
+      console.warn("Driver not found or update failed");
+    } else {
+      console.log("Driver updated successfully:", updatedDriver.fullname);
+    }
+    res.status(201).json({
+      message: "Aid assigned to driver successfully",
+      assignment: newAssignment
     });
-  }
 
-  res.status(200).json({ message: "Assignment created", data: driver });
-});
+  } catch (error) {
+    console.error("Error assigning aid:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

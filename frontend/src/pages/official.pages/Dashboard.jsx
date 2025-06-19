@@ -5,9 +5,11 @@ const Dashboard = () => {
     const handleClick = ()=>{
         navigate('/prediction')
     }
+    
   return (
     <div>
       <button onClick={handleClick}>Predict the suplies</button>
+      
     </div>
   )
 }
