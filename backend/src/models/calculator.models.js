@@ -1,11 +1,26 @@
 import mongoose, { Schema } from "mongoose";
 
 const populationSchema = new Schema({
-  children: { type: Number, required: true },
-  adult_males: { type: Number, required: true },
-  adult_females: { type: Number, required: true },
-  elderly: { type: Number, required: true },
-  total: { type: Number, required: true }
+  children: { 
+    type: Number, 
+    required: true 
+  },
+  adult_males:{
+     type: Number,
+     required: true 
+  },
+  adult_females: {
+     type: Number,
+     required: true 
+  },
+  elderly: {
+     type: Number, 
+     required: true 
+  },
+  total: { 
+    type: Number,
+     required: true
+ }
 }, { _id: false });
 
 const foodSchema = new Schema({

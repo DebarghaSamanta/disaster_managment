@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios';
 import { Doughnut } from 'react-chartjs-2';
 import 'chart.js/auto';
@@ -32,6 +32,7 @@ const Calculator = () => {
   const [submittedData, setSubmittedData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
