@@ -5,11 +5,13 @@ const Dashboard = () => {
     const handleClick = ()=>{
         navigate('/prediction')
     }
-    
+    const handlelogin= ()=>{
+      navigate('/register')
+    }
   return (
     <div>
       <button onClick={handleClick}>Predict the suplies</button>
-      
+      <button onClick={handlelogin}>Register</button>
     </div>
   )
 }

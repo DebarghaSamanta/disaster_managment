@@ -71,11 +71,16 @@ const createAidPrediction = async (req, res) => {
     const min_protein = total * 0.1 * days;
     if (food.Water_l < min_water) food.Water_l = min_water;
     if (food.Protein_kg < min_protein) food.Protein_kg = min_protein;
+    let total_weight = Object.values(food).reduce((sum, val) => sum + val, 0);
 
+    // Convert non-food item units to kg equivalents
+    total_weight += non_food.Medicines_Units * 0.01;
+    total_weight += non_food.Sanitary_Napkin_Packets * 0.1;
     // Step 3: Save predicted aid
     const aidPrediction = await PredictedAid.create({
       food,
-      non_food
+      non_food,
+      total_weight
     });
 
     // Step 4: Create AidRecord linking input and predicted aid

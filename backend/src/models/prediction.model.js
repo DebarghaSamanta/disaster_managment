@@ -18,7 +18,9 @@ const nonFoodSchema = new Schema({
 
 const predictedAidSchema = new Schema({
   food: foodSchema,
-  non_food: nonFoodSchema
-}, { timestamps: true });
+  non_food: nonFoodSchema,
+  total_weight:{
+    type:Number
+}}, { timestamps: true });
 
 export const PredictedAid = mongoose.model("PredictedAid", predictedAidSchema);
