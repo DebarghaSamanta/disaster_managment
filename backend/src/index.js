@@ -13,10 +13,10 @@ connectDB()
     app.listen(process.env.PORT || 8000, () => {
       console.log(`✅ Server is running at port ${process.env.PORT}`);
 
-      // 🟡 Run news fetch once at startup
+      // Run news fetch once at startup
       fetchAndStoreNews();
 
-      // 🕒 Schedule it to run every 1 hour (you can change the interval)
+      // Schedule it to run every 1 hour (adjust if needed)
       cron.schedule("0 * * * *", async () => {
         console.log("🔁 Cron job running: Updating disaster news...");
         await fetchAndStoreNews();

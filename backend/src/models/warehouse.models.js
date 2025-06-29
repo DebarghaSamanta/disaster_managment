@@ -19,11 +19,7 @@ const itemSchema = new mongoose.Schema({
 }, 
   expiryDate: { 
     type: Date 
-}, 
-  itemCode: { 
-    type: String, 
-    unique: true, 
-    required: true },
+}
 });
 
 const warehouseSchema = new mongoose.Schema({
@@ -37,6 +33,6 @@ const warehouseSchema = new mongoose.Schema({
   capacity: { type: Number }, 
   items: [itemSchema],
   lastUpdated: { type: Date, default: Date.now },
-});
+},{timestamps:true});
 
 export const Warehouse = mongoose.model('Warehouse', warehouseSchema);
