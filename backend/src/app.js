@@ -16,7 +16,11 @@ app.use(cookieParser())
 
 import calculatorRouter from "./routes/calculator.routes.js"
 import userRouter from "./routes/user.routes.js"
+import chatRouter from "./routes/chat.routes.js"
+import newsRouter from "./routes/news.routes.js"
+
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/aid", calculatorRouter)
-
+app.use("/api/v1/chat",chatRouter)
+app.use("/api/v1/news",newsRouter)
 export {app}
