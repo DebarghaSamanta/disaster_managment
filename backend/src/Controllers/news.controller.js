@@ -21,7 +21,8 @@ const bannedWords = [
   "modi", "bjp", "congress", "rahul", "pm", "minister", "cabinet",
   "election", "finance", "stock", "business", "politics", "economy",
   "sports", "startup", "assembly", "parliament", "shinde", "thackeray",
-  "education", "language row", "religion", "tncc", "chief"
+  "education", "religion", "language row", "bollywood", "actor", "cricket",
+  "ipl", "budget", "trade", "gdp", "tax", "court", "justice", "film", "movie"
 ];
 
 const bannedSources = [
