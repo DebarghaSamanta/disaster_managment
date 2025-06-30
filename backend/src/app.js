@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import calculatorRouter from "./routes/calculation.routes.js";
+import calculatorRouter from "./routes/calculator.routes.js";
 import userRouter from "./routes/user.routes.js";
 import chatRouter from "./routes/chat.routes.js";
 import newsRouter from "./routes/news.routes.js";

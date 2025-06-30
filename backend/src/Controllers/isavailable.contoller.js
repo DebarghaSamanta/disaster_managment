@@ -30,7 +30,7 @@ export const getEligibleDriversForAssignment = async (req, res) => {
       const allDelivered = assignmentDoc.assignments.every(a => a.status === "delivered");
       if (allDelivered) {
         eligibleDrivers.push({
-          fullName: driver.fullName,
+          fullName: driver.fullname,
           vehicleType: driver.vehicleType,
           vehicleNumber: driver.vehicleNumber
         });

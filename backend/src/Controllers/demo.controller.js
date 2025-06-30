@@ -6,7 +6,7 @@ export const makeDriverAvailable = async (req, res) => {
 
     const updatedDriver = await User.findByIdAndUpdate(
       driverId,
-      { availabilityStatus: true },
+      { availabilityStatus: true },// to make availibilty status as false manualy set to false and if opposite to true  
       { new: true }
     );
 

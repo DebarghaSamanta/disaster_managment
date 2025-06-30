@@ -1,9 +1,9 @@
 import { Warehouse } from "../models/warehouse.models.js";
-
+import { PredictedAid } from "../models/prediction.model.js";
 const createWarehouse = async (req, res) => {
   const warehouse = new Warehouse(req.body);
   await warehouse.save();
-  req.io.emit('warehouseUpdated', warehouse);
+  global._io.emit('warehouseUpdated', warehouse);
   res.status(201).json(warehouse);
 };
 
@@ -163,5 +163,55 @@ const searchStock = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+const getEligibleWarehouses = async (req, res) => {
+  try {
+    const { predictedAidId } = req.params;
+    const predictedAid = await PredictedAid.findById(predictedAidId);
+    if (!predictedAid) return res.status(404).json({ error: "Predicted aid not found" });
 
-export {createWarehouse,getWarehouse,addStock,decrementStock,getStock,getLowStock,searchStock}
+    const eligibleWarehouses = await Warehouse.find().lean();
+    const eligible = [];
+
+    for (const warehouse of eligibleWarehouses) {
+      let hasEnough = true;
+
+      // Create an item map from warehouse items
+      const itemMap = new Map();
+      warehouse.items.forEach(item => {
+        itemMap.set(item.name, item.quantity);
+      });
+
+      // Check food
+      for (const [key, requiredQty] of Object.entries(predictedAid.food)) {
+        if ((itemMap.get(key) || 0) < requiredQty) {
+          hasEnough = false;
+          break;
+        }
+      }
+
+      // Check non-food
+      if (hasEnough) {
+        for (const [key, requiredQty] of Object.entries(predictedAid.non_food)) {
+          if ((itemMap.get(key) || 0) < requiredQty) {
+            hasEnough = false;
+            break;
+          }
+        }
+      }
+
+      if (hasEnough) {
+        eligible.push({
+          _id: warehouse._id,
+          warehouseName: warehouse.warehouseName,
+          location: warehouse.location
+        });
+      }
+    }
+
+    res.json(eligible);
+  } catch (error) {
+    console.error("GetEligibleWarehouses Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+export {createWarehouse,getWarehouse,addStock,decrementStock,getStock,getLowStock,searchStock,getEligibleWarehouses}
