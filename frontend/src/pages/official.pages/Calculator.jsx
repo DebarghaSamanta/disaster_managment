@@ -13,6 +13,7 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  MenuItem
 } from '@mui/material';
 
 const Calculator = () => {
@@ -32,6 +33,7 @@ const Calculator = () => {
   const [response, setResponse] = useState(null);
   const [prediction, setPrediction] = useState(null);
   const [availableDrivers, setAvailableDrivers] = useState([]);
+  const [eligibleWarehouses, setEligibleWarehouses] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [assignmentForm, setAssignmentForm] = useState({ source: '', destination: '' });
   const [successMessage, setSuccessMessage] = useState('');
@@ -47,6 +49,7 @@ const Calculator = () => {
     setResponse(null);
     setPrediction(null);
     setAvailableDrivers([]);
+    setEligibleWarehouses([]);
     setSuccessMessage('');
     setLoading(true);
 
@@ -62,8 +65,12 @@ const Calculator = () => {
       });
 
       setResponse(res.data);
+
       const aidDetails = await axios.get(`http://localhost:3000/api/v1/aid/prediction/${res.data.predicted_aid_id}`);
       setPrediction(aidDetails.data);
+
+      const warehouseRes = await axios.get(`http://localhost:3000/api/v1/warehouse/eligible/${res.data.predicted_aid_id}`);
+      setEligibleWarehouses(warehouseRes.data);
     } catch (err) {
       alert("Error: " + (err.response?.data?.error || "Something went wrong"));
     } finally {
@@ -88,16 +95,37 @@ const Calculator = () => {
 
   const submitAssignment = async () => {
     try {
+          console.log("Assigning aid with data:", {
+          driverId: selectedDriver.DriverId,
+          source: assignmentForm.source,
+          destination: assignmentForm.destination,
+          predictedAidId: response.predicted_aid_id
+        });
+        console.log("Selected driver object:", selectedDriver);
       await axios.post('http://localhost:3000/api/v1/aid/assign-aid-driver', {
         driverId: selectedDriver.DriverId,
         source: assignmentForm.source,
         destination: assignmentForm.destination,
         predictedAidId: response.predicted_aid_id
       });
-      setSuccessMessage(`Aid assigned to ${selectedDriver.fullName} successfully!`);
+
+      const aidItems = [
+        ...Object.entries(prediction.food),
+        ...Object.entries(prediction.non_food)
+      ];
+
+      for (const [itemName, quantity] of aidItems) {
+        if (itemName === '_id') continue;
+        await axios.put(`http://localhost:3000/api/v1/warehouse/${assignmentForm.source}/stock/decrement`, {
+          name: itemName,
+          quantity
+        });
+      }
+
+      setSuccessMessage(`Aid assigned to ${selectedDriver.fullName} and stock updated successfully!`);
       setSelectedDriver(null);
-    } catch {
-      alert("Failed to assign aid.");
+    } catch (error) {
+      alert("Assignment failed: " + (error.response?.data?.message || error.message || "Unknown error"));
     }
   };
 
@@ -107,6 +135,7 @@ const Calculator = () => {
         <Typography variant="h4" gutterBottom>
           Aid Prediction Calculator
         </Typography>
+
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
           <Grid container spacing={2}>
             {Object.keys(formData).map((key) => (
@@ -129,37 +158,36 @@ const Calculator = () => {
 
         {prediction && (
           <Box sx={{ mt: 4 }}>
-          <Typography variant="h5" gutterBottom>Predicted Aid Breakdown</Typography>
+            <Typography variant="h5" gutterBottom>Predicted Aid Breakdown</Typography>
 
-          <Typography variant="subtitle1" sx={{ mt: 2 }}>Food Items:</Typography>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            {Object.entries(prediction.food).filter(([key]) => key !== '_id').map(([key, value]) => (
-              <Grid item xs={12} sm={6} md={4} key={key}>
-                <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {key.replace(/_/g, ' ')}
-                  </Typography>
-                  <Typography variant="h6">{value}</Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
+            <Typography variant="subtitle1" sx={{ mt: 2 }}>Food Items:</Typography>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              {Object.entries(prediction.food).filter(([key]) => key !== '_id').map(([key, value]) => (
+                <Grid item xs={12} sm={6} sx={{ flexBasis: { xs: '100%', sm: '50%', md: '33.33%' } }} key={key}>
+                  <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {key.replace(/_/g, ' ')}
+                    </Typography>
+                    <Typography variant="h6">{value}</Typography>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
 
-          <Typography variant="subtitle1" sx={{ mt: 4 }}>Non-Food Items:</Typography>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            {Object.entries(prediction.non_food).filter(([key]) => key !== '_id').map(([key, value]) => (
-              <Grid item xs={12} sm={6} md={4} key={key}>
-                <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {key.replace(/_/g, ' ')}
-                  </Typography>
-                  <Typography variant="h6">{value}</Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-
+            <Typography variant="subtitle1" sx={{ mt: 4 }}>Non-Food Items:</Typography>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              {Object.entries(prediction.non_food).filter(([key]) => key !== '_id').map(([key, value]) => (
+                <Grid item xs={12} sm={6} sx={{ flexBasis: { xs: '100%', sm: '50%', md: '33.33%' } }} key={key}>
+                  <Paper elevation={2} sx={{ p: 2, textAlign: 'center' }}>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      {key.replace(/_/g, ' ')}
+                    </Typography>
+                    <Typography variant="h6">{value}</Typography>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
         )}
 
         <Divider sx={{ my: 4 }} />
@@ -190,13 +218,23 @@ const Calculator = () => {
             <Typography variant="h6" gutterBottom>
               Assign Aid to: {selectedDriver.fullName}
             </Typography>
+
             <TextField
+              select
               fullWidth
-              label="Source"
+              label="Source (Warehouse)"
               value={assignmentForm.source}
               onChange={(e) => setAssignmentForm({ ...assignmentForm, source: e.target.value })}
               sx={{ mb: 2 }}
-            />
+            >
+              <MenuItem value="">Select warehouse</MenuItem>
+              {eligibleWarehouses.map((wh) => (
+                <MenuItem key={wh._id} value={wh._id}>
+                  {wh.warehouseName} ({wh.location?.city}, {wh.location?.state})
+                </MenuItem>
+              ))}
+            </TextField>
+
             <TextField
               fullWidth
               label="Destination"
@@ -204,6 +242,7 @@ const Calculator = () => {
               onChange={(e) => setAssignmentForm({ ...assignmentForm, destination: e.target.value })}
               sx={{ mb: 2 }}
             />
+
             <Box sx={{ display: 'flex', gap: 2 }}>
               <Button variant="contained" onClick={submitAssignment}>Confirm</Button>
               <Button variant="outlined" color="error" onClick={() => setSelectedDriver(null)}>Cancel</Button>

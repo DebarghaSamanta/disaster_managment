@@ -39,13 +39,13 @@ const addStock = async (req, res) => {
       existing.expiryDate = expiryDate || existing.expiryDate;
     } else {
       warehouse.items.push({ name, category, quantity, unit, expiryDate });
-      req.io.emit("newStockItem", { warehouseId: req.params.id, name });
+      global._io.emit("newStockItem", { warehouseId: req.params.id, name });
     }
 
     warehouse.lastUpdated = new Date();
     await warehouse.save();
 
-    req.io.emit("stockUpdated", { warehouseId: req.params.id, name });
+    global._io.emit("stockUpdated", { warehouseId: req.params.id, name });
 
     res.status(200).json(warehouse);
   } catch (error) {
@@ -74,10 +74,10 @@ const decrementStock = async (req, res) => {
 
     await warehouse.save();
 
-    req.io.emit("stockUpdated", { warehouseId: req.params.id, itemName: name });
+    global._io.emit("stockUpdated", { warehouseId: req.params.id, itemName: name });
 
     if (item.quantity < threshold) {
-      req.io.emit("lowStockAlert", {
+      global._io.emit("lowStockAlert", {
         warehouseId: req.params.id,
         itemName: name,
         quantity: item.quantity
