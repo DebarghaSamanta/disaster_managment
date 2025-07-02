@@ -19,6 +19,15 @@ const getWarehouse = async (req, res) => {
   }
 };
 
+const getAllWarehouses = async (req, res) => {
+  try {
+    const warehouses = await Warehouse.find({}, { _id: 1, warehouseName: 1 });
+    res.json(warehouses);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch warehouses", error: err.message });
+  }
+};
+
 const addStock = async (req, res) => {
   const { name, category, quantity, unit, expiryDate } = req.body;
 
@@ -68,7 +77,7 @@ const decrementStock = async (req, res) => {
       return res.status(404).json({ message: "Item not found in warehouse" });
     }
 
-    item.quantity -= quantity;
+    item.quantity = Math.max(0, item.quantity - quantity);;
     item.expiryDate = item.expiryDate || null;
     warehouse.lastUpdated = new Date();
 
@@ -120,6 +129,7 @@ const getLowStock = async (req, res) => {
         // If quantity is below threshold, include it
         if (item.quantity < threshold) {
           lowStock.push({
+            warehouseName:warehouse.warehouseName,
             warehouseId: warehouse._id,
             itemName: item.name,
             quantity: item.quantity
@@ -214,4 +224,4 @@ const getEligibleWarehouses = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-export {createWarehouse,getWarehouse,addStock,decrementStock,getStock,getLowStock,searchStock,getEligibleWarehouses}
+export {createWarehouse,getWarehouse,addStock,decrementStock,getStock,getLowStock,searchStock,getEligibleWarehouses,getAllWarehouses}

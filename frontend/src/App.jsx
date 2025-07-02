@@ -6,6 +6,7 @@ import Calculator from './pages/official.pages/Calculator';
 import Dashboard from './pages/official.pages/dashboard';
 import ChatbotWidget from './components/CHatbotWidget';
 import Newspage from './pages/newspage'; 
+import WarehouseDashboard from './pages/official.pages/Warehousedashboard';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path='/register' element={<Register />} />
           <Route path='/login' element={<Login />} />
           <Route path='/prediction' element={<Calculator />} />
+          <Route path='/warehouse-dashboard' element={<WarehouseDashboard/>} />
           <Route path='/news' element={<Newspage />} /> {/* ✅ News page route */}
         </Routes>
       </BrowserRouter>
