@@ -7,7 +7,8 @@ import userRouter from "./routes/user.routes.js";
 import chatRouter from "./routes/chat.routes.js";
 import newsRouter from "./routes/news.routes.js";
 import warehouseRouter from "./routes/warehouse.routes.js";
-import DashboardRouter from "./routes/dashboard.routes.js"
+import DashboardRouter from "./routes/dashboard.routes.js";
+import admindashboardRouter from './routes/admindashboard.routes.js'
 const app = express();
 
 app.use(cors({
@@ -26,4 +27,5 @@ app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/news", newsRouter);
 app.use("/api/v1/warehouse", warehouseRouter);
 app.use("/api/v1/warehouse-d",DashboardRouter)
+app.use("/api/v1/admin-dashboard",admindashboardRouter)
 export { app };

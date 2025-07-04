@@ -18,7 +18,16 @@ const Login = () => {
         { phoneNumber, password },
         { withCredentials: true }
       );
+      console.log("Login successfull")
+       const userDepartment = response.data?.data?.user?.department;
 
+        if (userDepartment === "Logistics and Operation Planning") {
+          navigate("/admin-dashboard");
+        } else if (userDepartment === "Driver") {
+          navigate("/");
+        } else {
+          setError("Unknown user department");
+        }
       
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please try again.");
